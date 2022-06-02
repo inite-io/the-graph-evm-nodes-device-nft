@@ -1,4 +1,6 @@
 specVersion: 0.0.4
+features:
+  - fullTextSearch
 schema:
   file: ./schema.graphql
 dataSources:
@@ -6,9 +8,9 @@ dataSources:
     name: NFT
     network: mumbai
     source:
-      address: "0xE4da4e67CC27d9D4BAEc86826b42d2C9E97280d8"
+      address: "0xD643434F8AD8Bb386Be43Ca526E477cd5202A2AD"
       abi: NFT
-      startBlock: 26238988 
+      startBlock: 26561500  
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5

@@ -8,7 +8,7 @@
     "remove-local": "graph remove --node http://localhost:8020/ werber/bsc-not-main-four",
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 werber/bsc-not-main-four",
     "polygon:template:testnet": "./scripts/polygon/generate_template_testnet.sh",
-    "polygon:deploy:testnet": "yarn polygon:template:testnet && yarn codegen && yarn build && graph deploy --node https://api.thegraph.com/deploy/ werber/polygon-testnet-2",
+    "polygon:deploy:testnet": "yarn polygon:template:testnet && yarn codegen && yarn build && graph deploy --node https://api.thegraph.com/deploy/ werber/ideas-evm-polygon-1",
     "polygon:template:mainnet": "./scripts/polygon/generate_template_mainnet.sh",
     "polygon:deploy:mainnet": "yarn polygon:template:mainnet && yarn codegen && yarn build && graph deploy --node https://api.thegraph.com/deploy/ werber/inite-polygon-v2",
     "aurora:template:testnet": "./scripts/aurora/generate_template_testnet.sh",

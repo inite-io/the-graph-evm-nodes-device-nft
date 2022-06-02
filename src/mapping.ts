@@ -1,11 +1,11 @@
 import { bigInt, BigInt, json, JSONValue } from "@graphprotocol/graph-ts"
 import {
-  BSCTestNet,
+  NFT,
   Approval,
   ApprovalForAll,
   Transfer,
   buyed
-} from "../generated/BSCTestNet/BSCTestNet"
+} from "../generated/NFT/NFT"
 import { NFTToken, User } from "../generated/schema"
 
 export function handleApproval(event: Approval): void {
@@ -58,7 +58,7 @@ export function handleTransfer(event: Transfer): void {
   if (!token) {
     token = new NFTToken(event.params.tokenId.toString());
     
-    let tokenContract = BSCTestNet.bind(event.address);
+    let tokenContract = NFT.bind(event.address);
     const tokenInfo = tokenContract.getItemInfo(event.params.tokenId)[0];
 
     token.creator = tokenInfo.creator.toHexString();
