@@ -62,6 +62,28 @@ export class ApprovalForAll__Params {
   }
 }
 
+export class OwnershipTransferred extends ethereum.Event {
+  get params(): OwnershipTransferred__Params {
+    return new OwnershipTransferred__Params(this);
+  }
+}
+
+export class OwnershipTransferred__Params {
+  _event: OwnershipTransferred;
+
+  constructor(event: OwnershipTransferred) {
+    this._event = event;
+  }
+
+  get previousOwner(): Address {
+    return this._event.parameters[0].value.toAddress();
+  }
+
+  get newOwner(): Address {
+    return this._event.parameters[1].value.toAddress();
+  }
+}
+
 export class Transfer extends ethereum.Event {
   get params(): Transfer__Params {
     return new Transfer__Params(this);
@@ -126,7 +148,7 @@ export class buyed__Params {
   }
 }
 
-export class BSCTestNet__tokensDataResult {
+export class NFT__tokensDataResult {
   value0: BigInt;
   value1: string;
   value2: boolean;
@@ -156,9 +178,29 @@ export class BSCTestNet__tokensDataResult {
     map.set("value4", ethereum.Value.fromAddress(this.value4));
     return map;
   }
+
+  getPrice(): BigInt {
+    return this.value0;
+  }
+
+  getData(): string {
+    return this.value1;
+  }
+
+  getOnSale(): boolean {
+    return this.value2;
+  }
+
+  getTokenID(): BigInt {
+    return this.value3;
+  }
+
+  getCreator(): Address {
+    return this.value4;
+  }
 }
 
-export class BSCTestNet__obtenerNftsResultValue0Struct extends ethereum.Tuple {
+export class NFT__listAllNFTsResultValue0Struct extends ethereum.Tuple {
   get price(): BigInt {
     return this[0].toBigInt();
   }
@@ -180,7 +222,7 @@ export class BSCTestNet__obtenerNftsResultValue0Struct extends ethereum.Tuple {
   }
 }
 
-export class BSCTestNet__obtenerPaginav1ResultValue0Struct extends ethereum.Tuple {
+export class NFT__tokensOfResultValue0Struct extends ethereum.Tuple {
   get price(): BigInt {
     return this[0].toBigInt();
   }
@@ -202,7 +244,7 @@ export class BSCTestNet__obtenerPaginav1ResultValue0Struct extends ethereum.Tupl
   }
 }
 
-export class BSCTestNet__obtenerPaginav2ResultValue0Struct extends ethereum.Tuple {
+export class NFT__getItemInfoResultValue0Struct extends ethereum.Tuple {
   get price(): BigInt {
     return this[0].toBigInt();
   }
@@ -224,97 +266,9 @@ export class BSCTestNet__obtenerPaginav2ResultValue0Struct extends ethereum.Tupl
   }
 }
 
-export class BSCTestNet__tokensOfResultValue0Struct extends ethereum.Tuple {
-  get price(): BigInt {
-    return this[0].toBigInt();
-  }
-
-  get data(): string {
-    return this[1].toString();
-  }
-
-  get onSale(): boolean {
-    return this[2].toBoolean();
-  }
-
-  get tokenID(): BigInt {
-    return this[3].toBigInt();
-  }
-
-  get creator(): Address {
-    return this[4].toAddress();
-  }
-}
-
-export class BSCTestNet__tokensOfPaginav1ResultValue0Struct extends ethereum.Tuple {
-  get price(): BigInt {
-    return this[0].toBigInt();
-  }
-
-  get data(): string {
-    return this[1].toString();
-  }
-
-  get onSale(): boolean {
-    return this[2].toBoolean();
-  }
-
-  get tokenID(): BigInt {
-    return this[3].toBigInt();
-  }
-
-  get creator(): Address {
-    return this[4].toAddress();
-  }
-}
-
-export class BSCTestNet__getItemInfoResultValue0Struct extends ethereum.Tuple {
-  get price(): BigInt {
-    return this[0].toBigInt();
-  }
-
-  get data(): string {
-    return this[1].toString();
-  }
-
-  get onSale(): boolean {
-    return this[2].toBoolean();
-  }
-
-  get tokenID(): BigInt {
-    return this[3].toBigInt();
-  }
-
-  get creator(): Address {
-    return this[4].toAddress();
-  }
-}
-
-export class BSCTestNet__obtenerNftsbyrangoResultValue0Struct extends ethereum.Tuple {
-  get price(): BigInt {
-    return this[0].toBigInt();
-  }
-
-  get data(): string {
-    return this[1].toString();
-  }
-
-  get onSale(): boolean {
-    return this[2].toBoolean();
-  }
-
-  get tokenID(): BigInt {
-    return this[3].toBigInt();
-  }
-
-  get creator(): Address {
-    return this[4].toAddress();
-  }
-}
-
-export class BSCTestNet extends ethereum.SmartContract {
-  static bind(address: Address): BSCTestNet {
-    return new BSCTestNet("BSCTestNet", address);
+export class NFT extends ethereum.SmartContract {
+  static bind(address: Address): NFT {
+    return new NFT("NFT", address);
   }
 
   _tokenIds(): BigInt {
@@ -349,6 +303,40 @@ export class BSCTestNet extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  baseTokenURI(): string {
+    let result = super.call("baseTokenURI", "baseTokenURI():(string)", []);
+
+    return result[0].toString();
+  }
+
+  try_baseTokenURI(): ethereum.CallResult<string> {
+    let result = super.tryCall("baseTokenURI", "baseTokenURI():(string)", []);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toString());
+  }
+
+  contractOwner(): Address {
+    let result = super.call("contractOwner", "contractOwner():(address)", []);
+
+    return result[0].toAddress();
+  }
+
+  try_contractOwner(): ethereum.CallResult<Address> {
+    let result = super.tryCall(
+      "contractOwner",
+      "contractOwner():(address)",
+      []
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
   getApproved(tokenId: BigInt): Address {
@@ -398,21 +386,6 @@ export class BSCTestNet extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBoolean());
   }
 
-  minero(): Address {
-    let result = super.call("minero", "minero():(address)", []);
-
-    return result[0].toAddress();
-  }
-
-  try_minero(): ethereum.CallResult<Address> {
-    let result = super.tryCall("minero", "minero():(address)", []);
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toAddress());
-  }
-
   nTokenOnSale(): BigInt {
     let result = super.call("nTokenOnSale", "nTokenOnSale():(uint256)", []);
 
@@ -441,6 +414,21 @@ export class BSCTestNet extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toString());
+  }
+
+  owner(): Address {
+    let result = super.call("owner", "owner():(address)", []);
+
+    return result[0].toAddress();
+  }
+
+  try_owner(): ethereum.CallResult<Address> {
+    let result = super.tryCall("owner", "owner():(address)", []);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
   ownerOf(tokenId: BigInt): Address {
@@ -572,14 +560,14 @@ export class BSCTestNet extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toString());
   }
 
-  tokensData(param0: BigInt): BSCTestNet__tokensDataResult {
+  tokensData(param0: BigInt): NFT__tokensDataResult {
     let result = super.call(
       "tokensData",
       "tokensData(uint256):(uint256,string,bool,uint256,address)",
       [ethereum.Value.fromUnsignedBigInt(param0)]
     );
 
-    return new BSCTestNet__tokensDataResult(
+    return new NFT__tokensDataResult(
       result[0].toBigInt(),
       result[1].toString(),
       result[2].toBoolean(),
@@ -588,9 +576,7 @@ export class BSCTestNet extends ethereum.SmartContract {
     );
   }
 
-  try_tokensData(
-    param0: BigInt
-  ): ethereum.CallResult<BSCTestNet__tokensDataResult> {
+  try_tokensData(param0: BigInt): ethereum.CallResult<NFT__tokensDataResult> {
     let result = super.tryCall(
       "tokensData",
       "tokensData(uint256):(uint256,string,bool,uint256,address)",
@@ -601,7 +587,7 @@ export class BSCTestNet extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      new BSCTestNet__tokensDataResult(
+      new NFT__tokensDataResult(
         value[0].toBigInt(),
         value[1].toString(),
         value[2].toBoolean(),
@@ -626,32 +612,40 @@ export class BSCTestNet extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
-  minar(receptor: Address, datos: string, price: BigInt): BigInt {
+  mint(
+    receptor: Address,
+    metadata: string,
+    price: BigInt,
+    creator: Address
+  ): BigInt {
     let result = super.call(
-      "minar",
-      "minar(address,string,uint256):(uint256)",
+      "mint",
+      "mint(address,string,uint256,address):(uint256)",
       [
         ethereum.Value.fromAddress(receptor),
-        ethereum.Value.fromString(datos),
-        ethereum.Value.fromUnsignedBigInt(price)
+        ethereum.Value.fromString(metadata),
+        ethereum.Value.fromUnsignedBigInt(price),
+        ethereum.Value.fromAddress(creator)
       ]
     );
 
     return result[0].toBigInt();
   }
 
-  try_minar(
+  try_mint(
     receptor: Address,
-    datos: string,
-    price: BigInt
+    metadata: string,
+    price: BigInt,
+    creator: Address
   ): ethereum.CallResult<BigInt> {
     let result = super.tryCall(
-      "minar",
-      "minar(address,string,uint256):(uint256)",
+      "mint",
+      "mint(address,string,uint256,address):(uint256)",
       [
         ethereum.Value.fromAddress(receptor),
-        ethereum.Value.fromString(datos),
-        ethereum.Value.fromUnsignedBigInt(price)
+        ethereum.Value.fromString(metadata),
+        ethereum.Value.fromUnsignedBigInt(price),
+        ethereum.Value.fromAddress(creator)
       ]
     );
     if (result.reverted) {
@@ -661,10 +655,10 @@ export class BSCTestNet extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
-  transferirNft(to: Address, tokenId: BigInt): Address {
+  transferNFT(to: Address, tokenId: BigInt): Address {
     let result = super.call(
-      "transferirNft",
-      "transferirNft(address,uint256):(address)",
+      "transferNFT",
+      "transferNFT(address,uint256):(address)",
       [
         ethereum.Value.fromAddress(to),
         ethereum.Value.fromUnsignedBigInt(tokenId)
@@ -674,13 +668,10 @@ export class BSCTestNet extends ethereum.SmartContract {
     return result[0].toAddress();
   }
 
-  try_transferirNft(
-    to: Address,
-    tokenId: BigInt
-  ): ethereum.CallResult<Address> {
+  try_transferNFT(to: Address, tokenId: BigInt): ethereum.CallResult<Address> {
     let result = super.tryCall(
-      "transferirNft",
-      "transferirNft(address,uint256):(address)",
+      "transferNFT",
+      "transferNFT(address,uint256):(address)",
       [
         ethereum.Value.fromAddress(to),
         ethereum.Value.fromUnsignedBigInt(tokenId)
@@ -693,41 +684,22 @@ export class BSCTestNet extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
-  quemarNft(tokenId: BigInt): boolean {
-    let result = super.call("quemarNft", "quemarNft(uint256):(bool)", [
-      ethereum.Value.fromUnsignedBigInt(tokenId)
-    ]);
-
-    return result[0].toBoolean();
-  }
-
-  try_quemarNft(tokenId: BigInt): ethereum.CallResult<boolean> {
-    let result = super.tryCall("quemarNft", "quemarNft(uint256):(bool)", [
-      ethereum.Value.fromUnsignedBigInt(tokenId)
-    ]);
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBoolean());
-  }
-
-  obtenerNfts(): Array<BSCTestNet__obtenerNftsResultValue0Struct> {
+  listAllNFTs(): Array<NFT__listAllNFTsResultValue0Struct> {
     let result = super.call(
-      "obtenerNfts",
-      "obtenerNfts():((uint256,string,bool,uint256,address)[])",
+      "listAllNFTs",
+      "listAllNFTs():((uint256,string,bool,uint256,address)[])",
       []
     );
 
-    return result[0].toTupleArray<BSCTestNet__obtenerNftsResultValue0Struct>();
+    return result[0].toTupleArray<NFT__listAllNFTsResultValue0Struct>();
   }
 
-  try_obtenerNfts(): ethereum.CallResult<
-    Array<BSCTestNet__obtenerNftsResultValue0Struct>
+  try_listAllNFTs(): ethereum.CallResult<
+    Array<NFT__listAllNFTsResultValue0Struct>
   > {
     let result = super.tryCall(
-      "obtenerNfts",
-      "obtenerNfts():((uint256,string,bool,uint256,address)[])",
+      "listAllNFTs",
+      "listAllNFTs():((uint256,string,bool,uint256,address)[])",
       []
     );
     if (result.reverted) {
@@ -735,101 +707,23 @@ export class BSCTestNet extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      value[0].toTupleArray<BSCTestNet__obtenerNftsResultValue0Struct>()
+      value[0].toTupleArray<NFT__listAllNFTsResultValue0Struct>()
     );
   }
 
-  obtenerPaginav1(
-    nTokenP: BigInt,
-    nPagina: BigInt
-  ): Array<BSCTestNet__obtenerPaginav1ResultValue0Struct> {
-    let result = super.call(
-      "obtenerPaginav1",
-      "obtenerPaginav1(uint256,uint256):((uint256,string,bool,uint256,address)[])",
-      [
-        ethereum.Value.fromUnsignedBigInt(nTokenP),
-        ethereum.Value.fromUnsignedBigInt(nPagina)
-      ]
-    );
-
-    return result[0].toTupleArray<
-      BSCTestNet__obtenerPaginav1ResultValue0Struct
-    >();
-  }
-
-  try_obtenerPaginav1(
-    nTokenP: BigInt,
-    nPagina: BigInt
-  ): ethereum.CallResult<Array<BSCTestNet__obtenerPaginav1ResultValue0Struct>> {
-    let result = super.tryCall(
-      "obtenerPaginav1",
-      "obtenerPaginav1(uint256,uint256):((uint256,string,bool,uint256,address)[])",
-      [
-        ethereum.Value.fromUnsignedBigInt(nTokenP),
-        ethereum.Value.fromUnsignedBigInt(nPagina)
-      ]
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(
-      value[0].toTupleArray<BSCTestNet__obtenerPaginav1ResultValue0Struct>()
-    );
-  }
-
-  obtenerPaginav2(
-    nTokenP: BigInt,
-    nPagina: BigInt
-  ): Array<BSCTestNet__obtenerPaginav2ResultValue0Struct> {
-    let result = super.call(
-      "obtenerPaginav2",
-      "obtenerPaginav2(uint256,uint256):((uint256,string,bool,uint256,address)[])",
-      [
-        ethereum.Value.fromUnsignedBigInt(nTokenP),
-        ethereum.Value.fromUnsignedBigInt(nPagina)
-      ]
-    );
-
-    return result[0].toTupleArray<
-      BSCTestNet__obtenerPaginav2ResultValue0Struct
-    >();
-  }
-
-  try_obtenerPaginav2(
-    nTokenP: BigInt,
-    nPagina: BigInt
-  ): ethereum.CallResult<Array<BSCTestNet__obtenerPaginav2ResultValue0Struct>> {
-    let result = super.tryCall(
-      "obtenerPaginav2",
-      "obtenerPaginav2(uint256,uint256):((uint256,string,bool,uint256,address)[])",
-      [
-        ethereum.Value.fromUnsignedBigInt(nTokenP),
-        ethereum.Value.fromUnsignedBigInt(nPagina)
-      ]
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(
-      value[0].toTupleArray<BSCTestNet__obtenerPaginav2ResultValue0Struct>()
-    );
-  }
-
-  tokensOf(owner: Address): Array<BSCTestNet__tokensOfResultValue0Struct> {
+  tokensOf(owner: Address): Array<NFT__tokensOfResultValue0Struct> {
     let result = super.call(
       "tokensOf",
       "tokensOf(address):((uint256,string,bool,uint256,address)[])",
       [ethereum.Value.fromAddress(owner)]
     );
 
-    return result[0].toTupleArray<BSCTestNet__tokensOfResultValue0Struct>();
+    return result[0].toTupleArray<NFT__tokensOfResultValue0Struct>();
   }
 
   try_tokensOf(
     owner: Address
-  ): ethereum.CallResult<Array<BSCTestNet__tokensOfResultValue0Struct>> {
+  ): ethereum.CallResult<Array<NFT__tokensOfResultValue0Struct>> {
     let result = super.tryCall(
       "tokensOf",
       "tokensOf(address):((uint256,string,bool,uint256,address)[])",
@@ -840,70 +734,23 @@ export class BSCTestNet extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      value[0].toTupleArray<BSCTestNet__tokensOfResultValue0Struct>()
+      value[0].toTupleArray<NFT__tokensOfResultValue0Struct>()
     );
   }
 
-  tokensOfPaginav1(
-    owner: Address,
-    nTok_porpagina: BigInt,
-    pag: BigInt
-  ): Array<BSCTestNet__tokensOfPaginav1ResultValue0Struct> {
-    let result = super.call(
-      "tokensOfPaginav1",
-      "tokensOfPaginav1(address,uint256,uint256):((uint256,string,bool,uint256,address)[])",
-      [
-        ethereum.Value.fromAddress(owner),
-        ethereum.Value.fromUnsignedBigInt(nTok_porpagina),
-        ethereum.Value.fromUnsignedBigInt(pag)
-      ]
-    );
-
-    return result[0].toTupleArray<
-      BSCTestNet__tokensOfPaginav1ResultValue0Struct
-    >();
-  }
-
-  try_tokensOfPaginav1(
-    owner: Address,
-    nTok_porpagina: BigInt,
-    pag: BigInt
-  ): ethereum.CallResult<
-    Array<BSCTestNet__tokensOfPaginav1ResultValue0Struct>
-  > {
-    let result = super.tryCall(
-      "tokensOfPaginav1",
-      "tokensOfPaginav1(address,uint256,uint256):((uint256,string,bool,uint256,address)[])",
-      [
-        ethereum.Value.fromAddress(owner),
-        ethereum.Value.fromUnsignedBigInt(nTok_porpagina),
-        ethereum.Value.fromUnsignedBigInt(pag)
-      ]
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(
-      value[0].toTupleArray<BSCTestNet__tokensOfPaginav1ResultValue0Struct>()
-    );
-  }
-
-  getItemInfo(
-    _token: BigInt
-  ): Array<BSCTestNet__getItemInfoResultValue0Struct> {
+  getItemInfo(_token: BigInt): Array<NFT__getItemInfoResultValue0Struct> {
     let result = super.call(
       "getItemInfo",
       "getItemInfo(uint256):((uint256,string,bool,uint256,address)[])",
       [ethereum.Value.fromUnsignedBigInt(_token)]
     );
 
-    return result[0].toTupleArray<BSCTestNet__getItemInfoResultValue0Struct>();
+    return result[0].toTupleArray<NFT__getItemInfoResultValue0Struct>();
   }
 
   try_getItemInfo(
     _token: BigInt
-  ): ethereum.CallResult<Array<BSCTestNet__getItemInfoResultValue0Struct>> {
+  ): ethereum.CallResult<Array<NFT__getItemInfoResultValue0Struct>> {
     let result = super.tryCall(
       "getItemInfo",
       "getItemInfo(uint256):((uint256,string,bool,uint256,address)[])",
@@ -914,48 +761,7 @@ export class BSCTestNet extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      value[0].toTupleArray<BSCTestNet__getItemInfoResultValue0Struct>()
-    );
-  }
-
-  obtenerNftsbyrango(
-    _Mintoken: BigInt,
-    _Maxtoken: BigInt
-  ): Array<BSCTestNet__obtenerNftsbyrangoResultValue0Struct> {
-    let result = super.call(
-      "obtenerNftsbyrango",
-      "obtenerNftsbyrango(uint256,uint256):((uint256,string,bool,uint256,address)[])",
-      [
-        ethereum.Value.fromUnsignedBigInt(_Mintoken),
-        ethereum.Value.fromUnsignedBigInt(_Maxtoken)
-      ]
-    );
-
-    return result[0].toTupleArray<
-      BSCTestNet__obtenerNftsbyrangoResultValue0Struct
-    >();
-  }
-
-  try_obtenerNftsbyrango(
-    _Mintoken: BigInt,
-    _Maxtoken: BigInt
-  ): ethereum.CallResult<
-    Array<BSCTestNet__obtenerNftsbyrangoResultValue0Struct>
-  > {
-    let result = super.tryCall(
-      "obtenerNftsbyrango",
-      "obtenerNftsbyrango(uint256,uint256):((uint256,string,bool,uint256,address)[])",
-      [
-        ethereum.Value.fromUnsignedBigInt(_Mintoken),
-        ethereum.Value.fromUnsignedBigInt(_Maxtoken)
-      ]
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(
-      value[0].toTupleArray<BSCTestNet__obtenerNftsbyrangoResultValue0Struct>()
+      value[0].toTupleArray<NFT__getItemInfoResultValue0Struct>()
     );
   }
 }
@@ -1016,6 +822,32 @@ export class ApproveCall__Outputs {
   _call: ApproveCall;
 
   constructor(call: ApproveCall) {
+    this._call = call;
+  }
+}
+
+export class RenounceOwnershipCall extends ethereum.Call {
+  get inputs(): RenounceOwnershipCall__Inputs {
+    return new RenounceOwnershipCall__Inputs(this);
+  }
+
+  get outputs(): RenounceOwnershipCall__Outputs {
+    return new RenounceOwnershipCall__Outputs(this);
+  }
+}
+
+export class RenounceOwnershipCall__Inputs {
+  _call: RenounceOwnershipCall;
+
+  constructor(call: RenounceOwnershipCall) {
+    this._call = call;
+  }
+}
+
+export class RenounceOwnershipCall__Outputs {
+  _call: RenounceOwnershipCall;
+
+  constructor(call: RenounceOwnershipCall) {
     this._call = call;
   }
 }
@@ -1172,20 +1004,80 @@ export class TransferFromCall__Outputs {
   }
 }
 
-export class MinarCall extends ethereum.Call {
-  get inputs(): MinarCall__Inputs {
-    return new MinarCall__Inputs(this);
+export class TransferOwnershipCall extends ethereum.Call {
+  get inputs(): TransferOwnershipCall__Inputs {
+    return new TransferOwnershipCall__Inputs(this);
   }
 
-  get outputs(): MinarCall__Outputs {
-    return new MinarCall__Outputs(this);
+  get outputs(): TransferOwnershipCall__Outputs {
+    return new TransferOwnershipCall__Outputs(this);
   }
 }
 
-export class MinarCall__Inputs {
-  _call: MinarCall;
+export class TransferOwnershipCall__Inputs {
+  _call: TransferOwnershipCall;
 
-  constructor(call: MinarCall) {
+  constructor(call: TransferOwnershipCall) {
+    this._call = call;
+  }
+
+  get newOwner(): Address {
+    return this._call.inputValues[0].value.toAddress();
+  }
+}
+
+export class TransferOwnershipCall__Outputs {
+  _call: TransferOwnershipCall;
+
+  constructor(call: TransferOwnershipCall) {
+    this._call = call;
+  }
+}
+
+export class SetBaseTokenURICall extends ethereum.Call {
+  get inputs(): SetBaseTokenURICall__Inputs {
+    return new SetBaseTokenURICall__Inputs(this);
+  }
+
+  get outputs(): SetBaseTokenURICall__Outputs {
+    return new SetBaseTokenURICall__Outputs(this);
+  }
+}
+
+export class SetBaseTokenURICall__Inputs {
+  _call: SetBaseTokenURICall;
+
+  constructor(call: SetBaseTokenURICall) {
+    this._call = call;
+  }
+
+  get _baseTokenURI(): string {
+    return this._call.inputValues[0].value.toString();
+  }
+}
+
+export class SetBaseTokenURICall__Outputs {
+  _call: SetBaseTokenURICall;
+
+  constructor(call: SetBaseTokenURICall) {
+    this._call = call;
+  }
+}
+
+export class MintCall extends ethereum.Call {
+  get inputs(): MintCall__Inputs {
+    return new MintCall__Inputs(this);
+  }
+
+  get outputs(): MintCall__Outputs {
+    return new MintCall__Outputs(this);
+  }
+}
+
+export class MintCall__Inputs {
+  _call: MintCall;
+
+  constructor(call: MintCall) {
     this._call = call;
   }
 
@@ -1193,19 +1085,23 @@ export class MinarCall__Inputs {
     return this._call.inputValues[0].value.toAddress();
   }
 
-  get datos(): string {
+  get metadata(): string {
     return this._call.inputValues[1].value.toString();
   }
 
   get price(): BigInt {
     return this._call.inputValues[2].value.toBigInt();
   }
+
+  get creator(): Address {
+    return this._call.inputValues[3].value.toAddress();
+  }
 }
 
-export class MinarCall__Outputs {
-  _call: MinarCall;
+export class MintCall__Outputs {
+  _call: MintCall;
 
-  constructor(call: MinarCall) {
+  constructor(call: MintCall) {
     this._call = call;
   }
 
@@ -1214,20 +1110,20 @@ export class MinarCall__Outputs {
   }
 }
 
-export class TransferirNftCall extends ethereum.Call {
-  get inputs(): TransferirNftCall__Inputs {
-    return new TransferirNftCall__Inputs(this);
+export class TransferNFTCall extends ethereum.Call {
+  get inputs(): TransferNFTCall__Inputs {
+    return new TransferNFTCall__Inputs(this);
   }
 
-  get outputs(): TransferirNftCall__Outputs {
-    return new TransferirNftCall__Outputs(this);
+  get outputs(): TransferNFTCall__Outputs {
+    return new TransferNFTCall__Outputs(this);
   }
 }
 
-export class TransferirNftCall__Inputs {
-  _call: TransferirNftCall;
+export class TransferNFTCall__Inputs {
+  _call: TransferNFTCall;
 
-  constructor(call: TransferirNftCall) {
+  constructor(call: TransferNFTCall) {
     this._call = call;
   }
 
@@ -1240,10 +1136,10 @@ export class TransferirNftCall__Inputs {
   }
 }
 
-export class TransferirNftCall__Outputs {
-  _call: TransferirNftCall;
+export class TransferNFTCall__Outputs {
+  _call: TransferNFTCall;
 
-  constructor(call: TransferirNftCall) {
+  constructor(call: TransferNFTCall) {
     this._call = call;
   }
 
@@ -1252,54 +1148,20 @@ export class TransferirNftCall__Outputs {
   }
 }
 
-export class QuemarNftCall extends ethereum.Call {
-  get inputs(): QuemarNftCall__Inputs {
-    return new QuemarNftCall__Inputs(this);
+export class ResellCall extends ethereum.Call {
+  get inputs(): ResellCall__Inputs {
+    return new ResellCall__Inputs(this);
   }
 
-  get outputs(): QuemarNftCall__Outputs {
-    return new QuemarNftCall__Outputs(this);
-  }
-}
-
-export class QuemarNftCall__Inputs {
-  _call: QuemarNftCall;
-
-  constructor(call: QuemarNftCall) {
-    this._call = call;
-  }
-
-  get tokenId(): BigInt {
-    return this._call.inputValues[0].value.toBigInt();
+  get outputs(): ResellCall__Outputs {
+    return new ResellCall__Outputs(this);
   }
 }
 
-export class QuemarNftCall__Outputs {
-  _call: QuemarNftCall;
+export class ResellCall__Inputs {
+  _call: ResellCall;
 
-  constructor(call: QuemarNftCall) {
-    this._call = call;
-  }
-
-  get value0(): boolean {
-    return this._call.outputValues[0].value.toBoolean();
-  }
-}
-
-export class RevenderCall extends ethereum.Call {
-  get inputs(): RevenderCall__Inputs {
-    return new RevenderCall__Inputs(this);
-  }
-
-  get outputs(): RevenderCall__Outputs {
-    return new RevenderCall__Outputs(this);
-  }
-}
-
-export class RevenderCall__Inputs {
-  _call: RevenderCall;
-
-  constructor(call: RevenderCall) {
+  constructor(call: ResellCall) {
     this._call = call;
   }
 
@@ -1312,28 +1174,28 @@ export class RevenderCall__Inputs {
   }
 }
 
-export class RevenderCall__Outputs {
-  _call: RevenderCall;
+export class ResellCall__Outputs {
+  _call: ResellCall;
 
-  constructor(call: RevenderCall) {
+  constructor(call: ResellCall) {
     this._call = call;
   }
 }
 
-export class QuitarDelMarketPlaceCall extends ethereum.Call {
-  get inputs(): QuitarDelMarketPlaceCall__Inputs {
-    return new QuitarDelMarketPlaceCall__Inputs(this);
+export class HideNFTFromMarketplaceCall extends ethereum.Call {
+  get inputs(): HideNFTFromMarketplaceCall__Inputs {
+    return new HideNFTFromMarketplaceCall__Inputs(this);
   }
 
-  get outputs(): QuitarDelMarketPlaceCall__Outputs {
-    return new QuitarDelMarketPlaceCall__Outputs(this);
+  get outputs(): HideNFTFromMarketplaceCall__Outputs {
+    return new HideNFTFromMarketplaceCall__Outputs(this);
   }
 }
 
-export class QuitarDelMarketPlaceCall__Inputs {
-  _call: QuitarDelMarketPlaceCall;
+export class HideNFTFromMarketplaceCall__Inputs {
+  _call: HideNFTFromMarketplaceCall;
 
-  constructor(call: QuitarDelMarketPlaceCall) {
+  constructor(call: HideNFTFromMarketplaceCall) {
     this._call = call;
   }
 
@@ -1342,28 +1204,28 @@ export class QuitarDelMarketPlaceCall__Inputs {
   }
 }
 
-export class QuitarDelMarketPlaceCall__Outputs {
-  _call: QuitarDelMarketPlaceCall;
+export class HideNFTFromMarketplaceCall__Outputs {
+  _call: HideNFTFromMarketplaceCall;
 
-  constructor(call: QuitarDelMarketPlaceCall) {
+  constructor(call: HideNFTFromMarketplaceCall) {
     this._call = call;
   }
 }
 
-export class ComprarNftCall extends ethereum.Call {
-  get inputs(): ComprarNftCall__Inputs {
-    return new ComprarNftCall__Inputs(this);
+export class BuyNFTCall extends ethereum.Call {
+  get inputs(): BuyNFTCall__Inputs {
+    return new BuyNFTCall__Inputs(this);
   }
 
-  get outputs(): ComprarNftCall__Outputs {
-    return new ComprarNftCall__Outputs(this);
+  get outputs(): BuyNFTCall__Outputs {
+    return new BuyNFTCall__Outputs(this);
   }
 }
 
-export class ComprarNftCall__Inputs {
-  _call: ComprarNftCall;
+export class BuyNFTCall__Inputs {
+  _call: BuyNFTCall;
 
-  constructor(call: ComprarNftCall) {
+  constructor(call: BuyNFTCall) {
     this._call = call;
   }
 
@@ -1372,10 +1234,10 @@ export class ComprarNftCall__Inputs {
   }
 }
 
-export class ComprarNftCall__Outputs {
-  _call: ComprarNftCall;
+export class BuyNFTCall__Outputs {
+  _call: BuyNFTCall;
 
-  constructor(call: ComprarNftCall) {
+  constructor(call: BuyNFTCall) {
     this._call = call;
   }
 }

@@ -21,8 +21,8 @@ dataSources:
         - NFTToken
         - User
       abis:
-        - name: BSCTestNet
-          file: ./abis/BSCTestNet.json
+        - name: NFT
+          file: ./abis/NFT.json
       eventHandlers:
         - event: Approval(indexed address,indexed address,indexed uint256)
           handler: handleApproval

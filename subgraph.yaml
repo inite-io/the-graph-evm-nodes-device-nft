@@ -1,14 +1,14 @@
-specVersion: 0.0.2
+specVersion: 0.0.4
 schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum
-    name: BSCTestNet
-    network: chapel
+    name: NFT
+    network: mumbai
     source:
-      address: "0xF7cAD1f9De025022BB370Bc59D9B2f4cE507771d"
-      abi: BSCTestNet
-      startBlock: 17393453
+      address: "0xE4da4e67CC27d9D4BAEc86826b42d2C9E97280d8"
+      abi: NFT
+      startBlock: 26238988 
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -21,8 +21,8 @@ dataSources:
         - NFTToken
         - User
       abis:
-        - name: BSCTestNet
-          file: ./abis/BSCTestNet.json
+        - name: NFT
+          file: ./abis/NFT.json
       eventHandlers:
         - event: Approval(indexed address,indexed address,indexed uint256)
           handler: handleApproval

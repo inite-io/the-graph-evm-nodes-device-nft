@@ -15,10 +15,6 @@ export class NFTToken extends Entity {
   constructor(id: string) {
     super();
     this.set("id", Value.fromString(id));
-
-    this.set("creator", Value.fromString(""));
-    this.set("token_id", Value.fromBigInt(BigInt.zero()));
-    this.set("owner", Value.fromString(""));
   }
 
   save(): void {
