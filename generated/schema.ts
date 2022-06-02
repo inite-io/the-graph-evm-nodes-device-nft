@@ -179,6 +179,24 @@ export class NFTToken extends Entity {
   set owner(value: string) {
     this.set("owner", Value.fromString(value));
   }
+
+  get last_change(): BigInt {
+    let value = this.get("last_change");
+    return value!.toBigInt();
+  }
+
+  set last_change(value: BigInt) {
+    this.set("last_change", Value.fromBigInt(value));
+  }
+
+  get another_change(): BigInt {
+    let value = this.get("another_change");
+    return value!.toBigInt();
+  }
+
+  set another_change(value: BigInt) {
+    this.set("another_change", Value.fromBigInt(value));
+  }
 }
 
 export class User extends Entity {

@@ -12,12 +12,12 @@ type NFTToken @entity {
   title: String
   description: String
   media: String
-  reference: String
   price: BigInt
   json: String
   on_sale: Boolean
   token_id: BigInt!
   owner: User!
+  last_change: BigInt!
 }
 
 type User @entity {

@@ -89,10 +89,7 @@ export function handleTransfer(event: Transfer): void {
       token.media = media.toString();
     }
 
-    const reference = data.toObject().get("reference");
-    if (reference) {
-      token.reference = reference.toString();
-    }
+    token.last_change = event.block.timestamp;
   }
   token.save();
 
@@ -105,5 +102,5 @@ export function handleTransfer(event: Transfer): void {
 }
 
 export function handlebuyed(event: buyed): void {
-  
+
 }
