@@ -102,23 +102,6 @@ export class NFTToken extends Entity {
     }
   }
 
-  get reference(): string | null {
-    let value = this.get("reference");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
-  }
-
-  set reference(value: string | null) {
-    if (!value) {
-      this.unset("reference");
-    } else {
-      this.set("reference", Value.fromString(<string>value));
-    }
-  }
-
   get price(): BigInt | null {
     let value = this.get("price");
     if (!value || value.kind == ValueKind.NULL) {
@@ -187,15 +170,6 @@ export class NFTToken extends Entity {
 
   set last_change(value: BigInt) {
     this.set("last_change", Value.fromBigInt(value));
-  }
-
-  get another_change(): BigInt {
-    let value = this.get("another_change");
-    return value!.toBigInt();
-  }
-
-  set another_change(value: BigInt) {
-    this.set("another_change", Value.fromBigInt(value));
   }
 }
 
